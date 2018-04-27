@@ -12,16 +12,16 @@ $connectionOptions = array(
 
 //Establishes the connection
 $conn = sqlsrv_connect($serverName, $connectionOptions);
-/*
-if( $conn ) {
-     echo "Connection established.<br />";
-}else{
-     echo "Connection could not be established.<br />";
-     die( print_r( sqlsrv_errors(), true));
-}
-*/
-$tsql= "INSERT INTO Users (UserName, Password, email,score)
-			VALUES ('".$username."', '".$password."', '".$email."','1500')";
+
+
+$tsql= "IF '".$username."' in (Select USERNAME from users)
+	select '1' AS error;
+Else IF
+	'".$email."' in (Select Email from users)
+	select '2' AS error;
+ELSE
+    INSERT INTO Users (UserName, Password, email,score)
+			VALUES ('".$username."', '".$password."', '".$email."','Round(Rand()*3000,0)');";
             
 $stmt = sqlsrv_query($conn, $tsql);
 
@@ -29,6 +29,7 @@ if(sqlsrv_rows_affected($stmt) > 0){
 		echo "alg"; 
 	}
 	else {
-		echo "there was an error";
+		$row = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_ASSOC);
+        echo $row["error"];
 	}
 ?>
